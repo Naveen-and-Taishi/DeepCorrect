@@ -7,6 +7,7 @@ import math
 
 from corrector import Corrector
 from referee import Referee
+from simulator import Simulator
 
 def load_data(batch_size):
     
@@ -34,6 +35,7 @@ def main():
 
     # TODO: Test
 
+    # testing that data loaded correctly
     for batch in d1:
         print(batch)
         break

@@ -10,7 +10,7 @@ class Referee(tf.keras.Model):
 
         # TODO: Initialize all hyperparameters
 
-        # TODO: Initiallize all trainable parameters
+        # TODO: Initialize all trainable parameters
         pass
 
     def call(self, inputs):
