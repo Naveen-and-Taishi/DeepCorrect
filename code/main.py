@@ -25,22 +25,33 @@ def load_data(batch_size):
 def run_d1(referee, d1):
     # TODO: train referee
     for epoch in range(100):
+        print("EPOCH " + str(epoch))
+        batch_counter = 0
         for batch in d1:
+            print("Batch " + str(batch_counter))
+            batch_counter += 1
             with tf.GradientTape() as tape:
                 probs = referee.call(batch['image'])
-                loss = referee.loss(probs, batch['labels'])
+                loss = referee.loss(probs, batch['labels'][:, 0])
             gradients = tape.gradient(loss, referee.trainable_variables)
             referee.Adam.apply_gradients(zip(gradients, referee.trainable_variables))
 
 
 def run_d2(corrector, referee, d2):
     # TODO: train corrector and test referee
-
     for epoch in range(100):
+        print("EPOCH " + str(epoch))
+        batch_counter = 0
         for batch in d2:
-            corrected_image = corrector.call(d2)
-
-            pass
+            print("Batch " + str(batch_counter))
+            batch_counter += 1
+            with tf.GradientTape() as tape:
+                # TODO: add training regimen
+                loss = 0
+                pass
+            gradients = tape.gradient(loss, referee.trainable_variables)
+            referee.Adam.apply_gradients(zip(gradients, referee.trainable_variables))
+            
 
 def run_d3(corrector, d3):
     # TODO: test corrector
@@ -49,7 +60,7 @@ def run_d3(corrector, d3):
 def main():
 
     # 100 as batch_size for now, change later
-    batch_size = 100
+    batch_size = 20
 
     corrector_deuteranope = Corrector(batch_size, 'D')
     corrector_protanope = Corrector(batch_size, 'P')
@@ -59,11 +70,11 @@ def main():
 
     d1, d2, d3 = load_data(batch_size)
 
-    # testing that data loaded correctly
-    for batch in d1:
-        print(batch['image'])
-        print(batch['labels'])
-        break
+    # # testing that data loaded correctly
+    # for batch in d1:
+    #     print(batch['image'])
+    #     print(batch['labels'][:, 0])
+    #     break
 
     # TODO: Train and test Corrector and Referee models 
 
@@ -81,6 +92,8 @@ def main():
     print("ACCURACY DEUTERANOPE: " + accuracy_deuteranope)
     print("ACCURACY PROTANOPE: " + accuracy_protanope)
     print("ACCURACY TRITANOPE: " + accuracy_tritanope)
+
+    # TODO: we can now use the trained corrector models to visualize some results here
 
     return
 
