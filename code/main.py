@@ -24,7 +24,14 @@ def load_data(batch_size):
 
 def run_d1(referee, d1):
     # TODO: train referee
-    pass
+    for epoch in range(100):
+        for batch in d1:
+            with tf.GradientTape() as tape:
+                probs = referee.call(batch['image'])
+                loss = referee.loss(probs, batch['labels'])
+            gradients = tape.gradient(loss, referee.trainable_variables)
+            referee.Adam.apply_gradients(zip(gradients, referee.trainable_variables))
+
 
 def run_d2(corrector, referee, d2):
     # TODO: train corrector and test referee
@@ -48,14 +55,15 @@ def main():
     corrector_protanope = Corrector(batch_size, 'P')
     corrector_tritanope = Corrector(batch_size, 'T')
 
-    referee = Referee()
+    referee = Referee(batch_size)
 
     d1, d2, d3 = load_data(batch_size)
 
     # testing that data loaded correctly
-    # for batch in d1:
-    #     print(batch)
-    #     break
+    for batch in d1:
+        print(batch['image'])
+        print(batch['labels'])
+        break
 
     # TODO: Train and test Corrector and Referee models 
 
