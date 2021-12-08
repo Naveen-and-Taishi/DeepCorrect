@@ -6,7 +6,7 @@ import math
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Reshape
 from tensorflow.math import exp, sqrt, square
-from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.applications import ResNet50V2
 
 class Referee(tf.keras.Model):
     def __init__(self, batch_size) -> None:
@@ -16,12 +16,15 @@ class Referee(tf.keras.Model):
         self.learning_rate = 0.01
         self.Adam = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
         self.batch_size = batch_size
-        self.hidden_size = 200
+        self.hidden_size = 128
 
         # TODO: Initialize all trainable parameters
 
-        self.VGG = VGG16(include_top=False, 
-            weights="imagenet")
+        self.ResNet50 = ResNet50V2(include_top=False, 
+            weights="imagenet",
+            input_shape=(500, 500, 3))
+
+        self.ResNet50.trainable = False
 
         self.referee = Sequential([
             Flatten(),
@@ -34,8 +37,7 @@ class Referee(tf.keras.Model):
     def call(self, inputs):
         # TODO: Write forward-pass logic
         # outputs a 1 by 1 by 20
-
-        vgg_output = self.VGG(inputs)
+        vgg_output = tf.stop_gradient(self.ResNet50(inputs))
         referee_output = self.referee(vgg_output)
 
         # this returns probability of input being one of the 20 images

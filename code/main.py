@@ -7,7 +7,6 @@ import math
 
 from corrector import Corrector
 from referee import Referee
-from simulator import Simulator
 
 def load_data(batch_size):
     
@@ -21,7 +20,7 @@ def load_data(batch_size):
     assert isinstance(d3, tf.data.Dataset)
 
     return d1, d2, d3
-    
+
 
 def run_d1(referee, d1):
     # TODO: train referee
@@ -103,9 +102,9 @@ def main():
     run_d2(corrector_protanope, referee, d2)
     run_d2(corrector_tritanope, referee, d2)
     print("STARTING D3")
-    accuracy_deuteranope = run_d3(corrector_deuteranope, d3)
-    accuracy_protanope = run_d3(corrector_protanope, d3)
-    accuracy_tritanope = run_d3(corrector_tritanope, d3)
+    accuracy_deuteranope = run_d3(corrector_deuteranope, referee, d3)
+    accuracy_protanope = run_d3(corrector_protanope, referee, d3)
+    accuracy_tritanope = run_d3(corrector_tritanope, referee, d3)
 
     print("ACCURACY DEUTERANOPE: " + accuracy_deuteranope)
     print("ACCURACY PROTANOPE: " + accuracy_protanope)
