@@ -16,13 +16,12 @@ class Referee(tf.keras.Model):
         self.learning_rate = 0.01
         self.Adam = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
         self.batch_size = batch_size
-        self.hidden_size = 128
+        self.hidden_size = 200
 
         # TODO: Initialize all trainable parameters
 
         self.ResNet50 = ResNet50V2(include_top=False, 
-            weights="imagenet",
-            input_shape=(500, 500, 3))
+            weights="imagenet")
 
         self.ResNet50.trainable = False
 
@@ -30,21 +29,23 @@ class Referee(tf.keras.Model):
             Flatten(),
             Dense(self.hidden_size, activation="relu"),
             Dense(self.hidden_size, activation="relu"),
-            Dense(80, activation="relu")
+            Dense(100, activation="relu")
         ])
         pass
 
     def call(self, inputs):
         # TODO: Write forward-pass logic
         # outputs a 1 by 1 by 20
-        vgg_output = tf.stop_gradient(self.ResNet50(inputs))
-        referee_output = self.referee(vgg_output)
+        print(inputs.shape)
+        resnet_output = self.ResNet50(inputs)
+        print(resnet_output.shape)
+        referee_output = self.referee(resnet_output)
 
-        # this returns probability of input being one of the 20 images
         return referee_output
     
     def loss(self, probs, labels): 
         # TODO: Write loss function
+        print(probs.shape)
         loss = tf.keras.losses.sparse_categorical_crossentropy(labels, probs, from_logits=True)
         return tf.reduce_sum(loss)
     
