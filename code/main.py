@@ -21,6 +21,7 @@ def load_data(batch_size):
     assert isinstance(d3, tf.data.Dataset)
 
     return d1, d2, d3
+    
 
 def run_d1(referee, d1):
     # TODO: train referee
@@ -31,8 +32,8 @@ def run_d1(referee, d1):
             print("Batch " + str(batch_counter))
             batch_counter += 1
             with tf.GradientTape() as tape:
-                probs = referee.call(batch['image'])
-                loss = referee.loss(probs, batch['labels'][:, 0])
+                logits = referee.call(batch['image'])
+                loss = referee.loss(logits, batch['labels'][:, 0])
                 print("loss: " + str(loss)) 
             gradients = tape.gradient(loss, referee.trainable_variables)
             referee.Adam.apply_gradients(zip(gradients, referee.trainable_variables))
@@ -50,17 +51,29 @@ def run_d2(corrector, referee, d2):
                 corrected_images = corrector(batch['image'])
                 simulated_corrected_images = corrector.simulator.simulate_image(corrected_images)
             # we don't want to alter the referee at this point, we it is outside the gradient tape
-            loss = referee.loss(simulated_corrected_images, batch['labels'])
+            loss = referee.loss(simulated_corrected_images, batch['labels'][:, 0])
             gradients = tape.gradient(loss, referee.trainable_variables)
             referee.Adam.apply_gradients(zip(gradients, referee.trainable_variables))
             
 
-def run_d3(corrector, d3):
-    # TODO: test corrector
+def run_d3(corrector, referee, d3):
+    # TODO: test our corrected images vs uncorrected images
 
-    # In the paper it says the corrector's results were compared with those of the linear corrector and with normal images
+    total_acc_corrected = 0
+    total_acc_uncorrected = 0
+    batch_counter = 0
 
-    pass
+    for batch in d3:
+        print("Batch " + str(batch_counter))
+        batch_counter += 1
+        corrected_images = corrector(batch['image'])
+        uncorrected_images = batch['image']
+        corrected_pred = referee.call(corrected_images)
+        uncorrected_pred = referee.call(uncorrected_images)
+        total_acc_corrected = tf.equal(tf.argmax(corrected_pred, 1), tf.argmax(batch['labels'][:, 0], 1))
+        total_acc_uncorrected = tf.equal(tf.argmax(uncorrected_pred, 1), tf.argmax(batch['labels'][:, 0], 1))
+
+    return total_acc_corrected / batch_counter, total_acc_uncorrected / batch_counter
 
 def main():
 

@@ -33,19 +33,16 @@ class Referee(tf.keras.Model):
 
     def call(self, inputs):
         # TODO: Write forward-pass logic
-        # outputs a 1 by 1 by 20 , normalized
+        # outputs a 1 by 1 by 20
 
         vgg_output = self.VGG(inputs)
-
-        print(vgg_output.shape)
-
-        referee_output = tf.nn.softmax(self.referee(vgg_output))
+        referee_output = self.referee(vgg_output)
 
         # this returns probability of input being one of the 20 images
         return referee_output
     
     def loss(self, probs, labels): 
         # TODO: Write loss function
-        loss = tf.keras.losses.sparse_categorical_crossentropy(labels, probs, from_logits=False)
+        loss = tf.keras.losses.sparse_categorical_crossentropy(labels, probs, from_logits=True)
         return tf.reduce_sum(loss)
     
