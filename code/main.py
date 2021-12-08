@@ -33,6 +33,7 @@ def run_d1(referee, d1):
             with tf.GradientTape() as tape:
                 probs = referee.call(batch['image'])
                 loss = referee.loss(probs, batch['labels'][:, 0])
+                print("loss: " + str(loss)) 
             gradients = tape.gradient(loss, referee.trainable_variables)
             referee.Adam.apply_gradients(zip(gradients, referee.trainable_variables))
 
@@ -46,15 +47,19 @@ def run_d2(corrector, referee, d2):
             print("Batch " + str(batch_counter))
             batch_counter += 1
             with tf.GradientTape() as tape:
-                # TODO: add training regimen
-                loss = 0
-                pass
+                corrected_images = corrector(batch['image'])
+                simulated_corrected_images = corrector.simulator.simulate_image(corrected_images)
+            # we don't want to alter the referee at this point, we it is outside the gradient tape
+            loss = referee.loss(simulated_corrected_images, batch['labels'])
             gradients = tape.gradient(loss, referee.trainable_variables)
             referee.Adam.apply_gradients(zip(gradients, referee.trainable_variables))
             
 
 def run_d3(corrector, d3):
     # TODO: test corrector
+
+    # In the paper it says the corrector's results were compared with those of the linear corrector and with normal images
+
     pass
 
 def main():
