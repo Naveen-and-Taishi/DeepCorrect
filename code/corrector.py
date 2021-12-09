@@ -15,13 +15,13 @@ class Corrector(tf.keras.Model):
 
         self.batch_size = batch_size
 
-        # maybe add max pool layers ?
-
         self.linear_corrector = tf.convert_to_tensor([[0, 0, 0], [0.7, 1, 0], [0.7, 0, 1]])
 
-        self.conv1 = tf.keras.layers.Conv2D(16, 3, padding='same')
-        self.conv2 = tf.keras.layers.Conv2D(16, 3, padding='same')
-        self.conv3 = tf.keras.layers.Conv2D(3, 3, padding='same')
+        self.corrector = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(16, 3, padding='same'),
+            tf.keras.layers.Conv2D(16, 3, padding='same'),
+            tf.keras.layers.Conv2D(3, 3, padding='same'),
+        ])
 
         self.simulator = Simulator(type)
 
@@ -42,9 +42,7 @@ class Corrector(tf.keras.Model):
         linear_output = inputs + tf.map_fn(self.linear_correct, simulator_difference)
 
         # convolutional layers
-        conv1_output = self.conv1(linear_output)
-        conv2_output = self.conv2(conv1_output)
-        conv3_output = self.conv3(conv2_output)
+        corrector_output = self.corrector(linear_output)
 
-        return conv3_output
+        return corrector_output
     

@@ -46,7 +46,7 @@ def run_d1(referee, d1):
 
 def run_d2(corrector, referee, d2):
     # TODO: train corrector and test referee
-    for epoch in range(5):
+    for epoch in range(2):
         print("EPOCH " + str(epoch))
         batch_counter = 0
         for batch in range(0, len(d2[0]), referee.batch_size):
@@ -92,7 +92,7 @@ def run_d3(corrector, referee, d3):
 def main():
 
     # 100 as batch_size for now, change later
-    batch_size = 100
+    batch_size = 500
 
     corrector_deuteranope = Corrector(batch_size, 'D')
     corrector_protanope = Corrector(batch_size, 'P')
@@ -116,8 +116,6 @@ def main():
     referee.load_weights('../models/referee.tf')
     #run for one batch to initialize params
     run_d1(referee, d1)
-
-    
 
 
     print("STARTING D2")
