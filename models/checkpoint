@@ -1,0 +1,2 @@
+model_checkpoint_path: "corrector_tritanope.tf"
+all_model_checkpoint_paths: "corrector_tritanope.tf"

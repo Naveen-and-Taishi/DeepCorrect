@@ -23,10 +23,13 @@ class Simulator():
     def simulate_image(self, image):
         # passes an image through the color-blindness simulator
         
-        inverted_rgb2lms = tf.matrix_inverse(self.rgb2lms)
+        inverted_rgb2lms = tf.linalg.inv(self.rgb2lms)
 
-        product1 = tf.tensordot(inverted_rgb2lms, self.color_matrix)
-        product2 = tf.tensordor(product1, self.rgb2lms)
-        simulated_image = tf.tensordot(product2, image)
+        product1 = tf.matmul(inverted_rgb2lms, self.color_matrix)
+        product2 = tf.matmul(product1, self.rgb2lms)
 
-        return simulated_image
+        original_image_shape = image.shape
+        
+        simulated_image = tf.transpose(tf.matmul(product2, tf.reshape(tf.transpose(image, perm=[2, 0, 1]), (image.shape[2], image.shape[0] * image.shape[1]))), perm=[1, 0])
+
+        return tf.reshape(simulated_image, original_image_shape)
